@@ -1,0 +1,44 @@
+# Byte-compiled files
+*.pyc
+*.pyo
+__pycache__/
+
+# Environment variables
+.env
+*.env
+
+# Virtual environment
+venv/
+env/
+
+# Logs
+*.log
+*.out
+*.err
+
+# Flask instance and config files
+instance/
+config.py
+
+# Database files
+*.db
+*.sqlite3
+
+# Cache files
+*.cache
+*.bak
+*.swp
+*.tmp
+
+# Jupyter Notebook checkpoints (if using notebooks in the project)
+.ipynb_checkpoints/
+
+# IDE/editor-specific files
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# OS-generated files
+.DS_Store
+Thumbs.db
