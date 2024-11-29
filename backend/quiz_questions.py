@@ -11,7 +11,12 @@ client = OpenAI(api_key=api_key)
 @app.route('/generate_quiz', methods=['GET'])
 def generate_quiz():
     # Parse the request body for dynamic prompts (optional)
-    prompt ="Generate a quiz about graphs and graph algorithms. It will be 15 multiple-choice questions. Provide only the questions, answer choices, and answers in JSON format. Do not include any explanations or additional text."
+    prompt = (
+        "Generate a quiz about graphs and graph algorithms. "
+        "Provide exactly 15 multiple-choice questions, answers, and answer choices "
+        "strictly in JSON array format. The output must only include the JSON array, "
+        "with no additional text, labels, or explanations."
+    )
 
     # Call OpenAI API
     try:
