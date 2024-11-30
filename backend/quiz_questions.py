@@ -3,19 +3,56 @@ from flask_cors import CORS
 from openai import OpenAI
 import os
 from dotenv import load_dotenv
+from flask_sqlalchemy import SQLAlchemy
+import json
+import re
 
 load_dotenv()
 app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("DATABASE_URL")  # Set Neon DB URL in .env
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db = SQLAlchemy(app)
 api_key = os.getenv("OPENAI_API_KEY")
 client = OpenAI(api_key=api_key)
-@app.route('/generate_quiz', methods=['GET'])
+
+class Quiz(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    topic = db.Column(db.String(200), nullable=False)
+    questions = db.relationship('QuizQuestion', backref='quiz', cascade="all, delete-orphan")
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "topic": self.topic,
+            "questions": [question.to_dict() for question in self.questions]
+        }
+
+class QuizQuestion(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    quiz_id = db.Column(db.Integer, db.ForeignKey('quiz.id'), nullable=False)
+    question = db.Column(db.String(500), nullable=False)
+    answer = db.Column(db.String(200), nullable=False)
+    choices = db.Column(db.Text, nullable=False)  # Store choices as a JSON string
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "question": self.question,
+            "answer": self.answer,
+            "choices": json.loads(self.choices)  # Convert JSON string back to list
+        }
+@app.route('/generate_quiz', methods=['POST'])
 def generate_quiz():
-    # Parse the request body for dynamic prompts (optional)
+    data = request.get_json()
+    if not data or 'topic' not in data:
+        return jsonify({"error": "Topic not provided"}), 400
+
+    topic = data['topic']
     prompt = (
-        "Generate a quiz about graphs and graph algorithms. "
+        f"Generate a quiz about {topic}. "
         "Provide exactly 15 multiple-choice questions, answers, and answer choices "
         "strictly in JSON array format. The output must only include the JSON array, "
-        "with no additional text, labels, or explanations."
+        "with no additional text, labels, or explanations. The json array will have questions, choices, and the answer"
     )
 
     # Call OpenAI API
@@ -32,18 +69,31 @@ def generate_quiz():
         raw_response = response.choices[0].message.content
         #print(raw_response)
         # Convert the string response into a JSON object
-        import json
-        import re
         json_match = re.search(r"\{.*\}|\[.*\]", raw_response, re.DOTALL)
         if json_match:
             raw_json = json_match.group(0)
             quiz_data = json.loads(raw_json)
         else:
             return jsonify({"error": "No valid JSON found in response"}), 500
+        new_quiz = Quiz(topic=topic)
+        db.session.add(new_quiz)
+        db.session.flush()  # Ensure the quiz ID is available
 
+        # Save each question to the database
+        for item in quiz_data:
+            question = item.get("question")
+            answer = item.get("answer")
+            choices = json.dumps(item.get("choices", []))  # Convert choices to JSON string
+
+            quiz_question = QuizQuestion(quiz_id=new_quiz.id, question=question, answer=answer, choices=choices)
+            db.session.add(quiz_question)
+
+        db.session.commit()  # Commit all changes to the database
         return jsonify(quiz_data), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
+    with app.app_context():
+        db.create_all()
     app.run(debug=True)
