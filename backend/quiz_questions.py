@@ -92,6 +92,28 @@ def generate_quiz():
         return jsonify(quiz_data), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
+@app.route('/get_quizzes', methods=['GET'])
+def get_quizzes():
+    quizzes = Quiz.query.all()
+    return jsonify([quiz.to_dict() for quiz in quizzes]), 200
+
+@app.route('/get_quiz/<int:quiz_id>', methods=['GET'])
+def get_quiz(quiz_id):
+    quiz = Quiz.query.get(quiz_id)
+    if not quiz:
+        return jsonify({"error": "Quiz not found"}), 404
+    return jsonify(quiz.to_dict()), 200
+
+@app.route('/delete_quiz/<int:quiz_id>', methods=['DELETE'])
+def delete_quiz(quiz_id):
+    quiz = Quiz.query.get(quiz_id)
+    if not quiz:
+        return jsonify({"error": "Quiz not found"}), 404
+
+    db.session.delete(quiz)
+    db.session.commit()
+    return jsonify({"message": f"Quiz with ID {quiz_id} has been deleted."}), 200
 
 if __name__ == '__main__':
     with app.app_context():
