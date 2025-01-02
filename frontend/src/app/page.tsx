@@ -6,7 +6,9 @@ export default function Home() {
     <main className=" flex flex-col gap-24 px-8 md:px-24 lg:px-36 pb-12">
       <div className=" flex flex-col gap-4">
         <div className="flex flex-col gap-2">
-          <h1 className=" font-bold text-4xl">A Better Way to Learn</h1>
+          <h1 className=" font-bold text-3xl md:text-4xl">
+            A Better Way to Learn
+          </h1>
           <div>
             <p className="hidden md:block">
               Whether you&apos;re studying, teaching, or just curious, our web
@@ -16,17 +18,17 @@ export default function Home() {
               customized quizzes in seconds - making learning smarter, faster,
               and more fun
             </p>
-            <p className="md:hidden">
-            Whether you&apos;re studying, teaching, or just curious, our web
-            app generates engaging, customized quizzes in seconds - making learning smarter, faster,
-            and more fun
+            <p className="md:hidden text-sm">
+              Whether you&apos;re studying, teaching, or just curious, our web
+              app generates engaging, customized quizzes in seconds - making
+              learning smarter, faster, and more fun
             </p>
           </div>
         </div>
         <div>
           <Button className=" bg-[#FF0000] hover:bg-[#FF5353]">
             Login with Google
-            <RiGoogleFill/>
+            <RiGoogleFill />
           </Button>
         </div>
         <div className=" mt-4">
@@ -41,8 +43,10 @@ export default function Home() {
       </div>
       <div className=" flex flex-col gap-4">
         <div className="flex flex-col gap-2">
-          <h1 className=" font-bold text-4xl">Leveraging AI Power</h1>
-          <p>
+          <h1 className=" font-bold text-3xl md:text-4xl">
+            Leveraging AI Power
+          </h1>
+          <p className="text-sm md:text-base">
             Input your quiz topics and any relevant files and your quiz will be
             created in seconds!
           </p>

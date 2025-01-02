@@ -9,14 +9,14 @@ import {
 } from "@/components/ui/navigation-menu";
 export default function Navbar() {
   return (
-    <header className=" flex items-center justify-between py-4 px-24 border-b">
+    <header className=" flex items-center justify-between py-4 px-8 lg:px-24 border-b">
       <Link href="/">
         <Image
           src="/quizify-logo.png"
           alt="quizify-logo"
           width={160}
           height={80}
-          className="w-[100px] lg:w-[140px]"
+          className="w-[110px] lg:w-[140px]"
         ></Image>
       </Link>
       <div>
