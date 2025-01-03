@@ -2,14 +2,17 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { useSession, signIn } from 'next-auth/react';
+import { useSession, signIn, signOut } from 'next-auth/react';
 import {
   NavigationMenu,
   NavigationMenuItem,
-  navigationMenuTriggerStyle,
+  NavigationMenuTrigger,
+  NavigationMenuContent,
   NavigationMenuLink,
   NavigationMenuList,
 } from '@/components/ui/navigation-menu';
+import { RiUser3Line, RiLogoutBoxLine } from "react-icons/ri";
+import { Button } from './ui/button';
 
 export default function Navbar() {
   const { data: session } = useSession();
@@ -31,27 +34,48 @@ export default function Navbar() {
           className="w-[110px] lg:w-[140px]"
         />
       </Link>
-      <div>
-        <NavigationMenu>
-          <NavigationMenuList>
+      <NavigationMenu>
+        <NavigationMenuList>
+          {session && session.user ? (
             <NavigationMenuItem>
-              {session && session.user ? (
-                <span className="px-4 py-2 text-gray-700">
-                  Welcome, {getFirstName(session.user.name)}
-                </span>
-              ) : (
-                <NavigationMenuLink
-                  asChild
-                  className={`${navigationMenuTriggerStyle()} bg-[#FF5353] text-white`}
-                >
-                  <button onClick={() => signIn('google')}>Log in</button>
-                </NavigationMenuLink>
-              )}
+              <NavigationMenuTrigger>
+                Hi, {getFirstName(session.user.name)}
+              </NavigationMenuTrigger>
+              <NavigationMenuContent>
+                <ul className="flex flex-col p-2 w-32">
+                  <li className='p-2  hover:bg-gray-100 rounded-md'>
+                    <Link href="/profile" passHref>
+                      <NavigationMenuLink className="text-sm flex items-center gap-2 text-gray-700">
+                        <RiUser3Line/>
+                        Profile
+                      </NavigationMenuLink>
+                    </Link>
+                  </li>
+                  <div className='border-b'></div>
+                  <li className='p-2 hover:bg-gray-100 rounded-md'>
+                    <button
+                      onClick={() => signOut()}
+                      className="text-sm text-gray-700 flex items-center gap-2"
+                    >
+                      <RiLogoutBoxLine/>
+                      Logout
+                    </button>
+                  </li>
+                </ul>
+              </NavigationMenuContent>
             </NavigationMenuItem>
-          </NavigationMenuList>
-        </NavigationMenu>
-      </div>
+          ) : (
+            <NavigationMenuItem>
+              <NavigationMenuLink
+                asChild
+                className="bg-[#FF5353] text-white px-4 py-2 rounded-md"
+              >
+                <Button onClick={() => signIn('google')} className=' hover:bg-[#FF0000]'>Log in</Button>
+              </NavigationMenuLink>
+            </NavigationMenuItem>
+          )}
+        </NavigationMenuList>
+      </NavigationMenu>
     </header>
   );
 }
-
