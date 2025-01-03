@@ -1,10 +1,16 @@
 "use client";
 import React, { useState, useRef, useEffect } from "react";
-import { useRouter } from 'next/navigation';
+import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
-import { RiDriveLine, RiPushpin2Line, RiArrowUpLine } from "react-icons/ri";
+import {
+  RiDriveLine,
+  RiPushpin2Line,
+  RiArrowUpLine,
+  RiArrowRightUpLine,
+} from "react-icons/ri";
 import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
 
 export default function CreateQuiz() {
   const { data: session, status } = useSession();
@@ -12,9 +18,9 @@ export default function CreateQuiz() {
   const [prompt, setPrompt] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   useEffect(() => {
-    if (status === 'unauthenticated') {
+    if (status === "unauthenticated") {
       // Redirect to the login page if the user is not authenticated
-      router.push('/');
+      router.push("/");
     }
   }, [status, router]);
 
@@ -37,19 +43,23 @@ export default function CreateQuiz() {
       handleSubmit(e);
     }
   };
-  
+
   const getFirstName = (fullName: string | null | undefined): string => {
-    if (!fullName) return '';
-    return fullName.split(' ')[0];
+    if (!fullName) return "";
+    return fullName.split(" ")[0];
   };
   return (
-    <main className=" flex flex-col gap-24 px-8 md:px-24 lg:px-36 pb-12">
+    <main className="flex flex-col gap-24 px-8 md:px-24 lg:px-36">
       <div>
         <div className="flex flex-col gap-2">
           <h1 className="font-bold text-3xl md:text-4xl">
-            {session?.user?.name ? `${getFirstName(session.user.name)}, what quiz do you want me to create?` : 'What quiz do you want me to create?'}
+            {session?.user?.name
+              ? `${getFirstName(
+                  session.user.name
+                )}, what quiz do you want me to create?`
+              : "What quiz do you want me to create?"}
           </h1>
-          <p className=" text-sm md:text-base">
+          <p className="text-sm md:text-base">
             Enter the quiz topic and insert any relevant files/materials here!
           </p>
         </div>
@@ -93,6 +103,35 @@ export default function CreateQuiz() {
               </div>
             </div>
           </form>
+        </div>
+        <div className="mt-4 md:space-x-2">
+          <Badge
+            variant="outline"
+            className="font-normal rounded-xl bg-neutral-100 border-neutral-300"
+          >
+            <div className="flex items-center gap-1 hover:gap-4">
+              Next.js Concepts
+              <RiArrowRightUpLine />
+            </div>
+          </Badge>
+          <Badge
+            variant="outline"
+            className="font-normal rounded-xl bg-neutral-100 border-neutral-300"
+          >
+            <div className="flex items-center gap-1 hover:gap-4">
+              Eigenvalues and Eigenvectors
+              <RiArrowRightUpLine />
+            </div>
+          </Badge>
+          <Badge
+            variant="outline"
+            className="font-normal rounded-xl bg-neutral-100 border-neutral-300"
+          >
+            <div className="flex items-center gap-1 hover:gap-4">
+              Graph Traversal Algorithms
+              <RiArrowRightUpLine />
+            </div>
+          </Badge>
         </div>
       </div>
     </main>
