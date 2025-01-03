@@ -1,5 +1,5 @@
-'use client';
-import { useSession, signIn} from 'next-auth/react';
+"use client";
+import { useSession, signIn } from "next-auth/react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { RiGoogleFill } from "react-icons/ri";
@@ -30,12 +30,12 @@ export default function Home() {
           </div>
         </div>
         <div>
-        {session ? (
+          {session ? (
             <Button
               className="bg-[#FF0000] hover:bg-[#FF5353] flex items-center gap-2"
               onClick={() => {
                 // Redirect to quiz creation page
-                window.location.href = '/create-quiz';
+                window.location.href = "/create-quiz";
               }}
             >
               Create a Quiz
@@ -43,7 +43,7 @@ export default function Home() {
           ) : (
             <Button
               className="bg-[#FF0000] hover:bg-[#FF5353] flex items-center gap-2"
-              onClick={() => signIn('google')}
+              onClick={() => signIn("google")}
             >
               Sign in with Google
               <RiGoogleFill />
