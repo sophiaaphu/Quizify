@@ -1,7 +1,11 @@
+'use client';
+import { useSession, signIn} from 'next-auth/react';
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { RiGoogleFill } from "react-icons/ri";
+
 export default function Home() {
+  const { data: session } = useSession();
   return (
     <main className=" flex flex-col gap-24 px-8 md:px-24 lg:px-36 pb-12">
       <div className=" flex flex-col gap-4">
@@ -26,10 +30,25 @@ export default function Home() {
           </div>
         </div>
         <div>
-          <Button className=" bg-[#FF0000] hover:bg-[#FF5353]">
-            Login with Google
-            <RiGoogleFill />
-          </Button>
+        {session ? (
+            <Button
+              className="bg-[#FF0000] hover:bg-[#FF5353] flex items-center gap-2"
+              onClick={() => {
+                // Redirect to quiz creation page
+                window.location.href = '/create-quiz';
+              }}
+            >
+              Create a Quiz
+            </Button>
+          ) : (
+            <Button
+              className="bg-[#FF0000] hover:bg-[#FF5353] flex items-center gap-2"
+              onClick={() => signIn('google')}
+            >
+              Sign in with Google
+              <RiGoogleFill />
+            </Button>
+          )}
         </div>
         <div className=" mt-4">
           <Image
