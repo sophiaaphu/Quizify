@@ -49,7 +49,7 @@ export default function CreateQuiz() {
           <h1 className="font-bold text-3xl md:text-4xl">
             {session?.user?.name ? `${getFirstName(session.user.name)}, what quiz do you want me to create?` : 'What quiz do you want me to create?'}
           </h1>
-          <p>
+          <p className=" text-sm md:text-base">
             Enter the quiz topic and insert any relevant files/materials here!
           </p>
         </div>
