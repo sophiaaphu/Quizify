@@ -7,7 +7,7 @@ import { RiGoogleFill } from "react-icons/ri";
 export default function Home() {
   const { data: session } = useSession();
   return (
-    <main className=" flex flex-col gap-24 px-8 md:px-24 lg:px-36 pb-12">
+    <main className=" flex flex-col gap-24 px-8 md:px-24 lg:px-36 pb-24">
       <div className=" flex flex-col gap-4">
         <div className="flex flex-col gap-2">
           <h1 className=" font-bold text-3xl md:text-4xl">
