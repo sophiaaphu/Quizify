@@ -49,7 +49,7 @@ export default function CreateQuiz() {
     return fullName.split(" ")[0];
   };
   return (
-    <main className="flex flex-col gap-24 px-8 md:px-24 lg:px-36">
+    <main className="flex flex-col gap-24 px-8 md:px-24 lg:px-36 -mt-6 md:mt-0">
       <div>
         <div className="flex flex-col gap-2">
           <h1 className="font-bold text-3xl md:text-4xl">
