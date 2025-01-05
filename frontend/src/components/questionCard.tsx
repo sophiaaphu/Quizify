@@ -23,8 +23,8 @@ export default function QuestionCard({
   return (
     <div className="flex flex-col border p-4 rounded-md md:p-6 gap-2">
       <div>
-        <p className="text-lg font-semibold">Question {questionNumber}</p>
-        <p className="text-neutral-400">{question}</p>
+        <p className="text-base md:text-lg font-semibold">Question {questionNumber}</p>
+        <p className="text-sm md:text-base text-neutral-400">{question}</p>
       </div>
       <div className="flex flex-col gap-1">
         {options.map((option, index) => (
@@ -42,7 +42,7 @@ export default function QuestionCard({
                   : "text-neutral-300"
               }`}
             />
-            <p>{option}</p>
+            <p className="text-sm md:text-base">{option}</p>
           </div>
         ))}
       </div>

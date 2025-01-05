@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect} from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
@@ -16,6 +16,8 @@ export default function CreateQuiz() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [prompt, setPrompt] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -31,12 +33,36 @@ export default function CreateQuiz() {
     }
   }, [prompt]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Submitted prompt:", prompt);
-    setPrompt("");
-  };
+    setLoading(true);
+    setError(null);
 
+    try {
+      const response = await fetch("http://localhost:5000/generate_quiz", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ topic: prompt }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Error: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      console.log("Quiz created:", data);
+      setPrompt("");
+      // Redirect to the quiz page with the new quiz ID
+      console.log("Quiz ID:", data.id);
+      router.push(`/quiz/${data.id}`);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();

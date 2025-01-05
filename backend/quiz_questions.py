@@ -9,6 +9,7 @@ import re
 
 load_dotenv()
 app = Flask(__name__)
+CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("DATABASE_URL")  # Set Neon DB URL in .env
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
@@ -89,7 +90,7 @@ def generate_quiz():
             db.session.add(quiz_question)
 
         db.session.commit()  # Commit all changes to the database
-        return jsonify(quiz_data), 200
+        return jsonify({"id": new_quiz.id, "quiz": quiz_data}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     
