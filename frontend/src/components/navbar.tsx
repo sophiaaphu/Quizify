@@ -24,7 +24,7 @@ export default function Navbar() {
   };
 
   return (
-    <header className="flex items-center justify-between py-4 px-8 lg:px-24 border-b">
+    <header className="flex items-center justify-between py-4 px-8 md:px-16 lg:px-24 border-b">
       <Link href="/">
         <Image
           src="/quizify-logo.png"
