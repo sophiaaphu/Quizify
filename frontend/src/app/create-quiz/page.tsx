@@ -17,7 +17,7 @@ export default function CreateQuiz() {
   const router = useRouter();
   const [prompt, setPrompt] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -33,7 +33,7 @@ export default function CreateQuiz() {
     }
   }, [prompt]);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
@@ -58,7 +58,11 @@ export default function CreateQuiz() {
       console.log("Quiz ID:", data.id);
       router.push(`/quiz/${data.id}`);
     } catch (err) {
-      setError(err.message);
+        if (err instanceof Error) {
+            setError(err.message);
+          } else {
+            setError("An unknown error occurred.");
+          }
     } finally {
       setLoading(false);
     }
@@ -74,6 +78,13 @@ export default function CreateQuiz() {
     if (!fullName) return "";
     return fullName.split(" ")[0];
   };
+  if (loading) {
+    return (
+      <main className="flex flex-col gap-24 px-8 md:px-24 lg:px-36 -mt-6 md:mt-0">
+        <p className="">Creating your quiz...</p>
+      </main>
+    );
+  }
   return (
     <main className="flex flex-col gap-24 px-8 md:px-24 lg:px-36 -mt-6 md:mt-0">
       <div>
@@ -89,6 +100,8 @@ export default function CreateQuiz() {
             Enter the quiz topic and insert any relevant files/materials here!
           </p>
         </div>
+        {loading && <p className="pt-2">Creating your quiz...</p>}
+        {error && <p className="pt-2 text-red-500">Error: {error}</p>}
         <div className=" pt-8">
           <form onSubmit={handleSubmit} className="">
             <div className="relative">
