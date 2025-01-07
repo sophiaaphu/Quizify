@@ -11,8 +11,14 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
+// Define the Quiz type
+type Quiz = {
+  title: string;
+  date: string;
+};
+
 // List of quizzes with their dates
-const quizzes = [
+const quizzes: Quiz[] = [
   { title: "Next.js Crash Course", date: "2025-01-06" },
   { title: "React Basics", date: "2025-01-06" },
   { title: "Advanced JavaScript", date: "2024-12-31" },
@@ -21,22 +27,21 @@ const quizzes = [
 ];
 
 // Function to format date as "Month Day, Year"
-const formatDate = (dateStr) => {
-    const [year, month, day] = dateStr.split("-").map(Number);
-    const dateObj = new Date(Date.UTC(year, month - 1, day));
-    return dateObj.toLocaleDateString("en-US", {
-      month: "long",
-      day: "numeric",
-      year: "numeric",
-    });
-  };
-  
+const formatDate = (dateStr: string): string => {
+  const [year, month, day] = dateStr.split("-").map(Number);
+  const dateObj = new Date(Date.UTC(year, month - 1, day));
+  return dateObj.toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
+};
 
 // Function to determine the period based on the date
-const determinePeriod = (dateStr) => {
+const determinePeriod = (dateStr: string): string => {
   const quizDate = new Date(dateStr);
   const today = new Date();
-  const diffDays = Math.floor((today - quizDate) / (1000 * 60 * 60 * 24));
+  const diffDays = Math.floor((today.getTime() - quizDate.getTime()) / (1000 * 60 * 60 * 24));
 
   if (diffDays === 1) return "Yesterday";
   if (diffDays <= 7) return "Previous 7 Days";
@@ -45,12 +50,17 @@ const determinePeriod = (dateStr) => {
 };
 
 // Group quizzes by period
-const groupedQuizzes = quizzes.reduce((acc, quiz) => {
-  const period = determinePeriod(quiz.date);
-  acc[period] = acc[period] || [];
-  acc[period].push(quiz);
-  return acc;
-}, {});
+const groupedQuizzes: Record<string, Quiz[]> = quizzes.reduce<Record<string, Quiz[]>>(
+  (acc, quiz) => {
+    const period = determinePeriod(quiz.date);
+    if (!acc[period]) {
+      acc[period] = [];
+    }
+    acc[period].push(quiz);
+    return acc;
+  },
+  {}
+);
 
 export default function QuizHistory() {
   const { data: session } = useSession();
@@ -63,9 +73,7 @@ export default function QuizHistory() {
             <TableHeader>
               <TableRow>
                 <TableHead className="font-semibold w-1/2">{period}</TableHead>
-                <TableHead className="font-semibold">
-                  Last Opened By Me
-                </TableHead>
+                <TableHead className="font-semibold">Last Opened By Me</TableHead>
                 <TableHead></TableHead>
               </TableRow>
             </TableHeader>
