@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import Image from 'next/image';
-import { useSession, signIn, signOut } from 'next-auth/react';
+import Link from "next/link";
+import Image from "next/image";
+import { useSession, signIn, signOut } from "next-auth/react";
 import {
   NavigationMenu,
   NavigationMenuItem,
@@ -10,17 +10,17 @@ import {
   NavigationMenuContent,
   NavigationMenuLink,
   NavigationMenuList,
-} from '@/components/ui/navigation-menu';
-import { RiUser3Line, RiLogoutBoxLine } from "react-icons/ri";
-import { Button } from './ui/button';
+} from "@/components/ui/navigation-menu";
+import { RiFileList2Line, RiLogoutBoxLine } from "react-icons/ri";
+import { Button } from "./ui/button";
 
 export default function Navbar() {
   const { data: session } = useSession();
 
   // Function to extract the first name from the full name
   const getFirstName = (fullName: string | null | undefined): string => {
-    if (!fullName) return '';
-    return fullName.split(' ')[0];
+    if (!fullName) return "";
+    return fullName.split(" ")[0];
   };
 
   return (
@@ -42,22 +42,22 @@ export default function Navbar() {
                 Hi, {getFirstName(session.user.name)}
               </NavigationMenuTrigger>
               <NavigationMenuContent>
-                <ul className="flex flex-col p-2 w-32">
-                  <li className='p-2  hover:bg-gray-100 rounded-md'>
-                    <Link href="/profile" passHref>
+                <ul className="flex flex-col p-2 w-36">
+                  <li className="p-2  hover:bg-gray-100 rounded-md">
+                    <Link href="/quiz-history" passHref>
                       <NavigationMenuLink className="text-sm flex items-center gap-2 text-gray-700">
-                        <RiUser3Line/>
-                        Profile
+                        <RiFileList2Line />
+                        Quiz History
                       </NavigationMenuLink>
                     </Link>
                   </li>
-                  <div className='border-b'></div>
-                  <li className='p-2 hover:bg-gray-100 rounded-md'>
+                  <div className="border-b"></div>
+                  <li className="p-2 hover:bg-gray-100 rounded-md">
                     <button
                       onClick={() => signOut()}
                       className="text-sm text-gray-700 flex items-center gap-2"
                     >
-                      <RiLogoutBoxLine/>
+                      <RiLogoutBoxLine />
                       Logout
                     </button>
                   </li>
@@ -70,7 +70,12 @@ export default function Navbar() {
                 asChild
                 className="bg-[#FF5353] text-white px-4 py-2 rounded-md"
               >
-                <Button onClick={() => signIn('google')} className=' hover:bg-[#FF0000]'>Log in</Button>
+                <Button
+                  onClick={() => signIn("google")}
+                  className=" hover:bg-[#FF0000]"
+                >
+                  Log in
+                </Button>
               </NavigationMenuLink>
             </NavigationMenuItem>
           )}
