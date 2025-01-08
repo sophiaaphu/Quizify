@@ -54,7 +54,7 @@ export default function Navbar() {
                   <div className="border-b"></div>
                   <li className="p-2 hover:bg-gray-100 rounded-md">
                     <button
-                      onClick={() => signOut()}
+                      onClick={() => signOut({ callbackUrl: '/' })}
                       className="text-sm text-gray-700 flex items-center gap-2"
                     >
                       <RiLogoutBoxLine />
