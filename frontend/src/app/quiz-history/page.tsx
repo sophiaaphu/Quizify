@@ -1,6 +1,5 @@
 "use client";
 
-import { useSession } from "next-auth/react";
 import { RiMore2Fill } from "react-icons/ri";
 import {
   Table,
@@ -21,7 +20,6 @@ type Quiz = {
 };
 
 export default function QuizHistory() {
-  const { data: session } = useSession();
   const router = useRouter();
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
 
