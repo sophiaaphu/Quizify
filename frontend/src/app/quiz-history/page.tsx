@@ -33,8 +33,12 @@ export default function QuizHistory() {
         const data = await response.json();
         // Sort quizzes by last_opened (or created_at if never opened) in descending order
         const sortedQuizzes = data.sort((a: Quiz, b: Quiz) => {
-          const timeA = a.last_opened ? new Date(a.last_opened).getTime() : new Date(a.created_at).getTime();
-          const timeB = b.last_opened ? new Date(b.last_opened).getTime() : new Date(b.created_at).getTime();
+          const timeA = a.last_opened
+            ? new Date(a.last_opened).getTime()
+            : new Date(a.created_at).getTime();
+          const timeB = b.last_opened
+            ? new Date(b.last_opened).getTime()
+            : new Date(b.created_at).getTime();
           return timeB - timeA;
         });
         setQuizzes(sortedQuizzes);
@@ -78,37 +82,39 @@ export default function QuizHistory() {
     try {
       // Update the quiz time before navigation
       await fetch(`http://localhost:5000/update_quiz_time/${quizId}`, {
-        method: 'PUT'
+        method: "PUT",
       });
-      
+
       // Navigate to the quiz
       router.push(`/quiz/${quizId}`);
     } catch (error) {
-      console.error('Error updating quiz time:', error);
+      console.error("Error updating quiz time:", error);
       // Still navigate even if the update fails
       router.push(`/quiz/${quizId}`);
     }
   };
 
   return (
-    <main className="flex flex-col gap-24 px-8 md:px-24 lg:px-36 pb-24">
+    <main className="flex flex-col gap-24 px-8 md:px-24 lg:px-36 pb-12 -mt-8">
       <div className="flex flex-col gap-8">
         {Object.entries(groupedQuizzes).map(([period, periodQuizzes]) => (
           <Table key={period}>
             <TableHeader>
               <TableRow>
-                <TableHead className="font-semibold w-1/2 py-3">{period}</TableHead>
+                <TableHead className="font-semibold w-1/2 py-3">
+                  {period}
+                </TableHead>
                 <TableHead className="font-semibold">Last Opened</TableHead>
                 <TableHead></TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {periodQuizzes.map((quiz) => (
-                <TableRow
-                  key={quiz.id}
-                  className="cursor-pointer"
-                >
-                  <TableCell onClick={() => handleQuizClick(quiz.id)} className="py-3">
+                <TableRow key={quiz.id} className="cursor-pointer">
+                  <TableCell
+                    onClick={() => handleQuizClick(quiz.id)}
+                    className="py-3"
+                  >
                     {quiz.topic}
                   </TableCell>
                   <TableCell>
