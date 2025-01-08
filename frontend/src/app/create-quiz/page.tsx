@@ -35,6 +35,11 @@ export default function CreateQuiz() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!session?.user?.email) {
+      setError("Please sign in to create a quiz");
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
@@ -44,7 +49,10 @@ export default function CreateQuiz() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ topic: prompt }),
+        body: JSON.stringify({ 
+          topic: prompt,
+          user_id: session.user.email
+        }),
       });
 
       if (!response.ok) {
@@ -52,17 +60,14 @@ export default function CreateQuiz() {
       }
 
       const data = await response.json();
-      console.log("Quiz created:", data);
       setPrompt("");
-      // Redirect to the quiz page with the new quiz ID
-      console.log("Quiz ID:", data.id);
       router.push(`/quiz/${data.id}`);
     } catch (err) {
-        if (err instanceof Error) {
-            setError(err.message);
-          } else {
-            setError("An unknown error occurred.");
-          }
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("An unknown error occurred.");
+      }
     } finally {
       setLoading(false);
     }

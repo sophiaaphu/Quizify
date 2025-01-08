@@ -19,6 +19,7 @@ client = OpenAI(api_key=api_key)
 
 class Quiz(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.String(200), nullable=False)
     topic = db.Column(db.String(200), nullable=False)
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     last_opened = db.Column(db.DateTime, nullable=True, default=datetime.utcnow)
@@ -27,6 +28,7 @@ class Quiz(db.Model):
     def to_dict(self):
         return {
             "id": self.id,
+            "user_id": self.user_id,
             "topic": self.topic,
             "created_at": self.created_at.isoformat(),
             "last_opened": self.last_opened.isoformat() if self.last_opened else self.created_at.isoformat(),
@@ -50,10 +52,12 @@ class QuizQuestion(db.Model):
 @app.route('/generate_quiz', methods=['POST'])
 def generate_quiz():
     data = request.get_json()
-    if not data or 'topic' not in data:
-        return jsonify({"error": "Topic not provided"}), 400
+    if not data or 'topic' not in data or 'user_id' not in data:
+        return jsonify({"error": "Topic or user ID not provided"}), 400
 
     topic = data['topic']
+    user_id = data['user_id']
+
     prompt = (
         f"Generate a quiz about {topic}. "
         "Provide exactly 15 multiple-choice questions, answers, and answer choices "
@@ -81,7 +85,7 @@ def generate_quiz():
             quiz_data = json.loads(raw_json)
         else:
             return jsonify({"error": "No valid JSON found in response"}), 500
-        new_quiz = Quiz(topic=topic)
+        new_quiz = Quiz(topic=topic, user_id=user_id)
         db.session.add(new_quiz)
         db.session.flush()  # Ensure the quiz ID is available
 
@@ -101,7 +105,11 @@ def generate_quiz():
     
 @app.route('/get_quizzes', methods=['GET'])
 def get_quizzes():
-    quizzes = Quiz.query.all()
+    user_id = request.args.get('user_id')
+    if not user_id:
+        return jsonify({"error": "User ID not provided"}), 400
+        
+    quizzes = Quiz.query.filter_by(user_id=user_id).all()
     return jsonify([quiz.to_dict() for quiz in quizzes]), 200
 
 @app.route('/get_quiz/<int:quiz_id>', methods=['GET'])

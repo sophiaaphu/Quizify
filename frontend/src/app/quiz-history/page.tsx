@@ -28,10 +28,14 @@ export default function QuizHistory() {
 
   useEffect(() => {
     const fetchQuizzes = async () => {
+      if (!session?.user?.email) return;
+
       try {
-        const response = await fetch("http://localhost:5000/get_quizzes");
+        const response = await fetch(`http://localhost:5000/get_quizzes?user_id=${encodeURIComponent(session.user.email)}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch quizzes');
+        }
         const data = await response.json();
-        // Sort quizzes by last_opened (or created_at if never opened) in descending order
         const sortedQuizzes = data.sort((a: Quiz, b: Quiz) => {
           const timeA = a.last_opened
             ? new Date(a.last_opened).getTime()
@@ -47,8 +51,10 @@ export default function QuizHistory() {
       }
     };
 
-    fetchQuizzes();
-  }, []);
+    if (session?.user?.email) {
+      fetchQuizzes();
+    }
+  }, [session]);
 
   // Modify determinePeriod to accept an optional date
   const determinePeriod = (dateStr: string | null): string => {
