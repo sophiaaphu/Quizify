@@ -21,6 +21,7 @@ class Quiz(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     topic = db.Column(db.String(200), nullable=False)
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    last_opened = db.Column(db.DateTime, nullable=True, default=datetime.utcnow)
     questions = db.relationship('QuizQuestion', backref='quiz', cascade="all, delete-orphan")
 
     def to_dict(self):
@@ -28,6 +29,7 @@ class Quiz(db.Model):
             "id": self.id,
             "topic": self.topic,
             "created_at": self.created_at.isoformat(),
+            "last_opened": self.last_opened.isoformat() if self.last_opened else self.created_at.isoformat(),
             "questions": [question.to_dict() for question in self.questions]
         }
 
@@ -118,6 +120,16 @@ def delete_quiz(quiz_id):
     db.session.delete(quiz)
     db.session.commit()
     return jsonify({"message": f"Quiz with ID {quiz_id} has been deleted."}), 200
+
+@app.route('/update_quiz_time/<int:quiz_id>', methods=['PUT'])
+def update_quiz_time(quiz_id):
+    quiz = Quiz.query.get(quiz_id)
+    if not quiz:
+        return jsonify({"error": "Quiz not found"}), 404
+    
+    quiz.last_opened = datetime.utcnow()
+    db.session.commit()
+    return jsonify(quiz.to_dict()), 200
 
 if __name__ == '__main__':
     with app.app_context():
