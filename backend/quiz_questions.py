@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 from flask_sqlalchemy import SQLAlchemy
 import json
 import re
+from datetime import datetime
 
 load_dotenv()
 app = Flask(__name__)
@@ -19,12 +20,14 @@ client = OpenAI(api_key=api_key)
 class Quiz(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     topic = db.Column(db.String(200), nullable=False)
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     questions = db.relationship('QuizQuestion', backref='quiz', cascade="all, delete-orphan")
 
     def to_dict(self):
         return {
             "id": self.id,
             "topic": self.topic,
+            "created_at": self.created_at.isoformat(),
             "questions": [question.to_dict() for question in self.questions]
         }
 

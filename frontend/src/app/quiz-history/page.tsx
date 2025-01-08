@@ -10,65 +10,73 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
-// Define the Quiz type
+// Update Quiz type to match backend structure
 type Quiz = {
-  title: string;
-  date: string;
+  id: number;
+  topic: string;
+  created_at: string;
 };
-
-// List of quizzes with their dates
-const quizzes: Quiz[] = [
-  { title: "Next.js Crash Course", date: "2025-01-06" },
-  { title: "React Basics", date: "2025-01-06" },
-  { title: "Advanced JavaScript", date: "2024-12-31" },
-  { title: "TypeScript Deep Dive", date: "2024-12-10" },
-  { title: "CSS Grid Tutorial", date: "2024-04-25" },
-];
-
-// Function to format date as "Month Day, Year"
-const formatDate = (dateStr: string): string => {
-  const [year, month, day] = dateStr.split("-").map(Number);
-  const dateObj = new Date(Date.UTC(year, month - 1, day));
-  return dateObj.toLocaleDateString("en-US", {
-    month: "long",
-    day: "numeric",
-    year: "numeric",
-  });
-};
-
-// Function to determine the period based on the date
-const determinePeriod = (dateStr: string): string => {
-  const quizDate = new Date(dateStr);
-  const today = new Date();
-  const diffDays = Math.floor((today.getTime() - quizDate.getTime()) / (1000 * 60 * 60 * 24));
-
-  if (diffDays === 1) return "Yesterday";
-  if (diffDays <= 7) return "Previous 7 Days";
-  if (diffDays <= 30) return "Previous 30 Days";
-  return "Earlier";
-};
-
-// Group quizzes by period
-const groupedQuizzes: Record<string, Quiz[]> = quizzes.reduce<Record<string, Quiz[]>>(
-  (acc, quiz) => {
-    const period = determinePeriod(quiz.date);
-    if (!acc[period]) {
-      acc[period] = [];
-    }
-    acc[period].push(quiz);
-    return acc;
-  },
-  {}
-);
 
 export default function QuizHistory() {
   const { data: session } = useSession();
+  const router = useRouter();
+  const [quizzes, setQuizzes] = useState<Quiz[]>([]);
+
+  useEffect(() => {
+    const fetchQuizzes = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/get_quizzes');
+        const data = await response.json();
+        // Sort quizzes by created_at in descending order (most recent first)
+        const sortedQuizzes = data.sort((a: Quiz, b: Quiz) => 
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        );
+        setQuizzes(sortedQuizzes);
+      } catch (error) {
+        console.error('Error fetching quizzes:', error);
+      }
+    };
+
+    fetchQuizzes();
+  }, []);
+
+  // Modify the determinePeriod function to work with ISO dates
+  const determinePeriod = (dateStr: string): string => {
+    const quizDate = new Date(dateStr);
+    const today = new Date();
+    const diffDays = Math.floor((today.getTime() - quizDate.getTime()) / (1000 * 60 * 60 * 24));
+
+    if (diffDays <= 1) return "Yesterday";
+    if (diffDays <= 7) return "Previous 7 Days";
+    if (diffDays <= 30) return "Previous 30 Days";
+    return "Earlier";
+  };
+
+  // Group quizzes by period
+  const groupedQuizzes = quizzes.reduce<Record<string, Quiz[]>>(
+    (acc, quiz) => {
+      const period = determinePeriod(quiz.created_at);
+      if (!acc[period]) {
+        acc[period] = [];
+      }
+      acc[period].push(quiz);
+      return acc;
+    },
+    {}
+  );
+
+  // Handle quiz selection
+  const handleQuizClick = (quizId: number) => {
+    router.push(`/quiz/${quizId}`);
+  };
 
   return (
     <main className="flex flex-col gap-24 px-8 md:px-24 lg:px-36 pb-24">
       <div className="flex flex-col gap-8">
-        {Object.entries(groupedQuizzes).map(([period, quizzes]) => (
+        {Object.entries(groupedQuizzes).map(([period, periodQuizzes]) => (
           <Table key={period}>
             <TableHeader>
               <TableRow>
@@ -78,10 +86,26 @@ export default function QuizHistory() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {quizzes.map((quiz, index) => (
-                <TableRow key={index}>
-                  <TableCell>{quiz.title}</TableCell>
-                  <TableCell>{formatDate(quiz.date)}</TableCell>
+              {periodQuizzes.map((quiz) => (
+                <TableRow 
+                  key={quiz.id} 
+                  className="cursor-pointer hover:bg-gray-100"
+                >
+                  <TableCell onClick={() => handleQuizClick(quiz.id)}>{quiz.topic}</TableCell>
+                  <TableCell>
+                    {determinePeriod(quiz.created_at) === "Yesterday" 
+                      ? new Date(quiz.created_at).toLocaleString("en-US", {
+                          hour: 'numeric',
+                          minute: 'numeric',
+                          hour12: true
+                        })
+                      : new Date(quiz.created_at).toLocaleDateString("en-US", {
+                          month: "long",
+                          day: "numeric",
+                          year: "numeric",
+                        })
+                    }
+                  </TableCell>
                   <TableCell className="text-right">
                     <RiMore2Fill className="ml-auto cursor-pointer" />
                   </TableCell>
