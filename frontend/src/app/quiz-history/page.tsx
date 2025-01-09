@@ -62,11 +62,16 @@ export default function QuizHistory() {
 
     const quizDate = new Date(dateStr);
     const today = new Date();
+    
+    // Reset hours to midnight for accurate day comparison
+    today.setHours(0, 0, 0, 0);
+    quizDate.setHours(0, 0, 0, 0);
+    
     const diffDays = Math.floor(
       (today.getTime() - quizDate.getTime()) / (1000 * 60 * 60 * 24)
     );
 
-    if (diffDays <= 0) return "Today";
+    if (diffDays === 0) return "Today";
     if (diffDays === 1) return "Yesterday";
     if (diffDays <= 7) return "Previous 7 Days";
     if (diffDays <= 30) return "Previous 30 Days";
