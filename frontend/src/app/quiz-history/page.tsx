@@ -16,10 +16,8 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 
 // Update Quiz type to match backend structure
 type Quiz = {
@@ -39,9 +37,13 @@ export default function QuizHistory() {
       if (!session?.user?.email) return;
 
       try {
-        const response = await fetch(`http://localhost:5000/get_quizzes?user_id=${encodeURIComponent(session.user.email)}`);
+        const response = await fetch(
+          `http://localhost:5000/get_quizzes?user_id=${encodeURIComponent(
+            session.user.email
+          )}`
+        );
         if (!response.ok) {
-          throw new Error('Failed to fetch quizzes');
+          throw new Error("Failed to fetch quizzes");
         }
         const data = await response.json();
         const sortedQuizzes = data.sort((a: Quiz, b: Quiz) => {
@@ -70,11 +72,11 @@ export default function QuizHistory() {
 
     const quizDate = new Date(dateStr);
     const today = new Date();
-    
+
     // Reset hours to midnight for accurate day comparison
     today.setHours(0, 0, 0, 0);
     quizDate.setHours(0, 0, 0, 0);
-    
+
     const diffDays = Math.floor(
       (today.getTime() - quizDate.getTime()) / (1000 * 60 * 60 * 24)
     );
@@ -117,18 +119,21 @@ export default function QuizHistory() {
   const handleDeleteQuiz = async (quizId: number, e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent triggering the quiz click handler
     try {
-      const response = await fetch(`http://localhost:5000/delete_quiz/${quizId}`, {
-        method: 'DELETE',
-      });
-      
+      const response = await fetch(
+        `http://localhost:5000/delete_quiz/${quizId}`,
+        {
+          method: "DELETE",
+        }
+      );
+
       if (!response.ok) {
-        throw new Error('Failed to delete quiz');
+        throw new Error("Failed to delete quiz");
       }
-      
+
       // Remove the quiz from the local state
-      setQuizzes(quizzes.filter(quiz => quiz.id !== quizId));
+      setQuizzes(quizzes.filter((quiz) => quiz.id !== quizId));
     } catch (error) {
-      console.error('Error deleting quiz:', error);
+      console.error("Error deleting quiz:", error);
     }
   };
 
@@ -179,9 +184,11 @@ export default function QuizHistory() {
                         <RiMore2Fill className="ml-auto" />
                       </DropdownMenuTrigger>
                       <DropdownMenuContent>
-                        <DropdownMenuItem onClick={(e) => handleDeleteQuiz(quiz.id, e)}>
+                        <DropdownMenuItem
+                          onClick={(e) => handleDeleteQuiz(quiz.id, e)}
+                        >
                           <div className="flex items-center w-full gap-2 justify-center">
-                            <RiDeleteBinLine/>
+                            <RiDeleteBinLine />
                             Delete
                           </div>
                         </DropdownMenuItem>
