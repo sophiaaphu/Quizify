@@ -1,7 +1,7 @@
 "use client";
 
 import { useSession } from "next-auth/react";
-import { RiMore2Fill } from "react-icons/ri";
+import { RiMore2Fill, RiDeleteBinLine } from "react-icons/ri";
 import {
   Table,
   TableBody,
@@ -12,6 +12,14 @@ import {
 } from "@/components/ui/table";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 // Update Quiz type to match backend structure
 type Quiz = {
@@ -105,6 +113,25 @@ export default function QuizHistory() {
     }
   };
 
+  // Add this delete handler function
+  const handleDeleteQuiz = async (quizId: number, e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent triggering the quiz click handler
+    try {
+      const response = await fetch(`http://localhost:5000/delete_quiz/${quizId}`, {
+        method: 'DELETE',
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to delete quiz');
+      }
+      
+      // Remove the quiz from the local state
+      setQuizzes(quizzes.filter(quiz => quiz.id !== quizId));
+    } catch (error) {
+      console.error('Error deleting quiz:', error);
+    }
+  };
+
   return (
     <main className="flex flex-col gap-24 px-8 md:px-24 lg:px-36 pb-12 -mt-8">
       <div className="flex flex-col gap-8">
@@ -147,7 +174,19 @@ export default function QuizHistory() {
                       : "Never Opened"}
                   </TableCell>
                   <TableCell className="text-right">
-                    <RiMore2Fill className="ml-auto" />
+                    <DropdownMenu>
+                      <DropdownMenuTrigger>
+                        <RiMore2Fill className="ml-auto" />
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent>
+                        <DropdownMenuItem onClick={(e) => handleDeleteQuiz(quiz.id, e)}>
+                          <div className="flex items-center w-full gap-2 justify-center">
+                            <RiDeleteBinLine/>
+                            Delete
+                          </div>
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </TableCell>
                 </TableRow>
               ))}
